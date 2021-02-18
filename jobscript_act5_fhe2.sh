@@ -5,7 +5,7 @@
 #SBATCH --time=02:00				# 2 min
 #SBATCH --mem=2000 
 #SBATCH --nodes=1
-#SBATCH --ntasks=50
+#SBATCH --ntasks=50         # could not run on monsoon due to high number of tasks, increasing number of nodes made the take too long.
 #SBATCH --cpus-per-task=1
 
 module load openmpi
