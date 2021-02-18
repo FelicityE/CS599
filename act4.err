@@ -1,0 +1,62 @@
+/home/fhe2/CS599/random_act4_fhe2.c: In function ‘main’:
+/home/fhe2/CS599/random_act4_fhe2.c:84:1: error: ‘nk’ undeclared (first use in this function)
+ nk == current_rank && my_rank != 0 && i < TOTALITER-1){
+ ^~
+/home/fhe2/CS599/random_act4_fhe2.c:84:1: note: each undeclared identifier is reported only once for each function it appears in
+/home/fhe2/CS599/random_act4_fhe2.c:84:54: error: expected ‘;’ before ‘)’ token
+ nk == current_rank && my_rank != 0 && i < TOTALITER-1){
+                                                      ^
+                                                      ;
+/home/fhe2/CS599/random_act4_fhe2.c:84:54: error: expected statement before ‘)’ token
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+slurmstepd: error: execve(): /home/fhe2/CS599/random_act4_fhe2: No such file or directory
+srun: error: cn41: tasks 0-24: Exited with exit code 2
+srun: error: cn46: tasks 25-49: Exited with exit code 2
