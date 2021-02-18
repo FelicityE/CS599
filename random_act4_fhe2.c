@@ -14,7 +14,7 @@
 #define SEED 72
 
 //Change this if you want, but make sure it is set to 10 when submitting the assignment
-#define TOTALITER 4
+#define TOTALITER 10
 
 int generateRandomRank(int max_rank, int my_rank);
 
@@ -36,11 +36,9 @@ int main(int argc, char **argv) {
   //seed rng do not modify
   srand(SEED+my_rank);
 
-  int next_rank;
-  int pre_rank;
 
   //WRITE CODE HERE  
-  //Write code here
+
   //buffer with my value
   int myValue;
 
@@ -48,53 +46,46 @@ int main(int argc, char **argv) {
   int myBuffer;
   int my_counter;
 
+  int current_rank;
+  int next_rank;
   MPI_Status status;
-  MPI_Request request;
-  
+    
+  current_rank = 0;
   my_counter = 0;
-  next_rank = generateRandomRank(nprocs-1, my_rank);
-  MPI_Bcast(&next_rank, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
   if(my_rank == 0){
-    printf("Broadcasting: %d\n\n", next_rank);
-    printf("\nMaster: first rank: %d\n",next_rank);
-    MPI_Send(&myValue, 1, MPI_INT, next_rank, 0, MPI_COMM_WORLD);
+      next_rank = generateRandomRank(nprocs-1, my_rank);
+      printf("\nMaster: first rank: %d\n",next_rank);
+      MPI_Send(&my_counter, 1, MPI_INT, next_rank, 0, MPI_COMM_WORLD);
   }
-  if(my_rank == next_rank){
-    pre_rank = my_rank;
-    printf("\nMy rank: %d, old counter: %d\n",my_rank, my_counter);
-    my_counter += my_rank;
-    printf("\nMy rank: %d, new counter: %d\n",my_rank, my_counter);
-    next_rank = generateRandomRank(nprocs-1, my_rank);
-    printf("\nMy rank: %d, next rank to recv: %d\n",my_rank, next_rank);
-    MPI_Send(&pre_rank, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
-    MPI_Send(&next_rank, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
-    MPI_Send(&my_counter, 1, MPI_INT, next_rank, 0, MPI_COMM_WORLD);
-  }
-  for(i = 0; i < TOTALITER-1; i++){
-    if(my_rank == 0){
-      MPI_Recv(&myBuffer, 1, MPI_INT, next_rank, 0, MPI_COMM_WORLD, &status);
-      pre_rank = myBuffer;
-      MPI_Recv(&myBuffer, 1, MPI_INT, next_rank, 0, MPI_COMM_WORLD, &status);
-      next_rank = myBuffer;
-      printf("Broadcasting: %d\n\n", next_rank);
-    }
-    MPI_Bcast(&pre_rank, 1, MPI_INT, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&next_rank, 1, MPI_INT, 0, MPI_COMM_WORLD);
-    if(my_rank == next_rank){
-      MPI_Recv(&myBuffer, 1, MPI_INT, pre_rank, 0, MPI_COMM_WORLD, &status);
+  MPI_Bcast(&current_rank, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&next_rank, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  for(i = 0; i < TOTALITER; i++){
+    if(my_rank == next_rank && my_rank !=0){
+      MPI_Recv(&myBuffer, 1, MPI_INT, current_rank, 0, MPI_COMM_WORLD, &status);
       my_counter = myBuffer;
+      current_rank = my_rank;
       printf("\nMy rank: %d, old counter: %d\n",my_rank, my_counter);
       my_counter += my_rank;
       printf("\nMy rank: %d, new counter: %d\n",my_rank, my_counter);
       next_rank = generateRandomRank(nprocs-1, my_rank);
       printf("\nMy rank: %d, next rank to recv: %d\n",my_rank, next_rank);
+      MPI_Send(&current_rank, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
       MPI_Send(&next_rank, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
-      MPI_Send(&pre_rank, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
+    }
+    if(my_rank == 0){
+      MPI_Recv(&myBuffer, 1, MPI_INT, next_rank, 0, MPI_COMM_WORLD, &status);
+      current_rank = myBuffer;
+      MPI_Recv(&myBuffer, 1, MPI_INT, next_rank, 0, MPI_COMM_WORLD, &status);
+      next_rank = myBuffer;
+    }
+    MPI_Bcast(&current_rank, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&next_rank, 1, MPI_INT, 0, MPI_COMM_WORLD);
+nk == current_rank && my_rank != 0 && i < TOTALITER-1){
       MPI_Send(&my_counter, 1, MPI_INT, next_rank, 0, MPI_COMM_WORLD);
     }
-  }
+    }
 
-  // MPI_Bcast(&next_rank, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
   
 

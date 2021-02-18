@@ -11,7 +11,7 @@
 //mpicc ring_act2_fhe2.c -lm -o ring_act2_fhe2
 
 //Example execution
-//mpirun -np 2 -hostfile myhostfile.txt ./ring_act2_fhe2
+//mpirun -np 6 -hostfile myhostfile.txt ./ring_act2_fhe2
 
 
 

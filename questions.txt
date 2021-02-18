@@ -8,4 +8,14 @@ Q3: What does process rank 5’s counter store at the end of the computation?
 A3: 40
 
 Q4: Comparing Programming Activities #2 and #3, which was easier to implement? Explain.
-A4: Act3 was easier than act 2 because I did not have to worry about deadlocking between the ranks when sending at the same time.
+A4: Activity #3 was easier than act Activity #2 because I did not have to worry about deadlocking between the ranks when sending at the same time.
+
+Q5: Comparing Programming Activities #4 and #5, which was easier to implement? Explain.
+A5: Activity #5.
+
+In Activity #4, I wrote the program with each rank refering back to rank zero to broadcast to all other ranks who the current and next ranks were, 
+then sent the package from the current rank to the next rank. 
+
+Activity #5 however, was easier to program because I wrote it with MPI_ANY_SOURCE in mind, and used a different approach in which the current rank 
+broadcast to all other ranks the next rank, and also only sent the package to the next rank. 
+In this case, using MPI_ANY_SOURCE keeps the current rank from deadlocking if the next rank doesn't know the previous rank it's recieving from.
