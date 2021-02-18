@@ -2,9 +2,9 @@
 #SBATCH --job-name=random4         
 #SBATCH --output=/home/fhe2/CS599/act4.out	
 #SBATCH --error=/home/fhe2/CS599/act4.err
-#SBATCH --time=02:00				# 2 min
+#SBATCH --time=05:00				# 2 min
 #SBATCH --mem=2000 
-#SBATCH --nodes=2
+#SBATCH --nodes=1
 #SBATCH --ntasks=50
 #SBATCH --cpus-per-task=1
 
