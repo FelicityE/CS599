@@ -2,10 +2,10 @@
 #SBATCH --job-name=random4         
 #SBATCH --output=/home/fhe2/CS599/act4.out	
 #SBATCH --error=/home/fhe2/CS599/act4.err
-#SBATCH --time=05:00				# 2 min
-#SBATCH --mem=2000 
+#SBATCH --time=00:30				# 2 min
+#SBATCH --mem=1000 
 #SBATCH --nodes=1
-#SBATCH --ntasks=50
+#SBATCH --ntasks=30
 #SBATCH --cpus-per-task=1
 
 module load openmpi

@@ -1,6 +1,62 @@
 
-My rank: 11, old counter: 175
+My rank: 11, old counter: 63
 
-My rank: 11, new counter: 186
+My rank: 11, new counter: 74
 
-My rank: 11, next rank to recv: 36
+My rank: 11, next rank to recv: 14
+
+My rank: 3, old counter: 6
+
+My rank: 3, new counter: 9
+
+My rank: 3, next rank to recv: 7
+
+My rank: 5, old counter: 0
+
+My rank: 5, new counter: 5
+
+My rank: 5, next rank to recv: 1
+
+My rank: 7, old counter: 9
+
+My rank: 7, new counter: 16
+
+My rank: 7, next rank to recv: 6
+
+My rank: 1, old counter: 5
+
+My rank: 1, new counter: 6
+
+My rank: 1, next rank to recv: 3
+
+My rank: 19, old counter: 44
+
+My rank: 19, new counter: 63
+
+My rank: 19, next rank to recv: 11
+
+My rank: 6, old counter: 16
+
+My rank: 6, new counter: 22
+
+My rank: 6, next rank to recv: 8
+
+My rank: 8, old counter: 22
+
+My rank: 8, new counter: 30
+
+My rank: 8, next rank to recv: 12
+
+My rank: 2, old counter: 42
+
+My rank: 2, new counter: 44
+
+My rank: 2, next rank to recv: 19
+
+Master: first rank: 5
+
+My rank: 12, old counter: 30
+
+My rank: 12, new counter: 42
+
+My rank: 12, next rank to recv: 2
