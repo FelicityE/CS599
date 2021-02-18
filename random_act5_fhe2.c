@@ -5,10 +5,10 @@
 #include <math.h>
 
 //Example compilation
-//mpicc random_comm_starter.c -lm -o random_comm_starter
+//mpicc random_act5_fhe2.c -lm -o random_act5_fhe2
 
 //Example execution
-//mpirun -np 1 -hostfile myhostfile.txt ./random_comm_starter
+//mpirun -np 1 -hostfile myhostfile.txt ./random_act5_fhe2
 
 //Do not change the seed, or your answer will not be correct
 #define SEED 72
@@ -38,8 +38,35 @@ int main(int argc, char **argv) {
 
 
   //WRITE CODE HERE  
+  //buffer to receive data
+  int myBuffer;
+  int my_counter;
+  int current_rank;
+  int next_rank;
 
+  MPI_Status status;
   
+  current_rank = 0;
+  my_counter = 0;
+
+  for(i = 0; i < TOTALITER; i++){
+    if(my_rank == current_rank){
+      next_rank = generateRandomRank(nprocs-1, my_rank);
+      printf("My rank: %d, next to recv: %d\n\n", my_rank, next_rank);
+      MPI_Send(&my_counter, 1, MPI_INT, next_rank, 0, MPI_COMM_WORLD);
+    }
+    MPI_Bcast(&next_rank, 1, MPI_INT, current_rank, MPI_COMM_WORLD);
+    if(my_rank == next_rank){
+      MPI_Recv(&myBuffer, 1, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
+      my_counter = myBuffer;
+      printf("My rank: %d, old counter: %d\n\n",my_rank, my_counter);
+      my_counter += my_rank;
+      printf("My rank: %d, new counter: %d\n\n",my_rank, my_counter);
+      current_rank = my_rank;
+    }
+    MPI_Bcast(&current_rank, 1, MPI_INT, next_rank, MPI_COMM_WORLD);
+  }
+
 
   MPI_Finalize();
   return 0;

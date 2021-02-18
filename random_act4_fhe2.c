@@ -5,10 +5,10 @@
 #include <math.h>
 
 //Example compilation
-//mpicc random_comm_starter.c -lm -o random_comm_starter
+//mpicc random_act4_fhe2.c -lm -o random_act4_fhe2
 
 //Example execution
-//mpirun -np 1 -hostfile myhostfile.txt ./random_comm_starter
+//mpirun -np 1 -hostfile myhostfile.txt ./random_act4_fhe2
 
 //Do not change the seed, or your answer will not be correct
 #define SEED 72
@@ -38,6 +38,56 @@ int main(int argc, char **argv) {
 
 
   //WRITE CODE HERE  
+
+  //buffer with my value
+  int myValue;
+
+  //buffer to receive data
+  int myBuffer;
+  int my_counter;
+
+  int current_rank;
+  int next_rank;
+  MPI_Status status;
+    
+  current_rank = 0;
+  my_counter = 0;
+
+  if(my_rank == 0){
+      next_rank = generateRandomRank(nprocs-1, my_rank);
+      printf("\nMaster: first rank: %d\n",next_rank);
+      MPI_Send(&my_counter, 1, MPI_INT, next_rank, 0, MPI_COMM_WORLD);
+  }
+  MPI_Bcast(&current_rank, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&next_rank, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  for(i = 0; i < TOTALITER; i++){
+    if(my_rank == next_rank && my_rank !=0){
+      MPI_Recv(&myBuffer, 1, MPI_INT, current_rank, 0, MPI_COMM_WORLD, &status);
+      my_counter = myBuffer;
+      current_rank = my_rank;
+      printf("\nMy rank: %d, old counter: %d\n",my_rank, my_counter);
+      my_counter += my_rank;
+      printf("\nMy rank: %d, new counter: %d\n",my_rank, my_counter);
+      next_rank = generateRandomRank(nprocs-1, my_rank);
+      printf("\nMy rank: %d, next rank to recv: %d\n",my_rank, next_rank);
+      MPI_Send(&current_rank, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
+      MPI_Send(&next_rank, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
+    }
+    if(my_rank == 0){
+      MPI_Recv(&myBuffer, 1, MPI_INT, next_rank, 0, MPI_COMM_WORLD, &status);
+      current_rank = myBuffer;
+      MPI_Recv(&myBuffer, 1, MPI_INT, next_rank, 0, MPI_COMM_WORLD, &status);
+      next_rank = myBuffer;
+    }
+    MPI_Bcast(&current_rank, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&next_rank, 1, MPI_INT, 0, MPI_COMM_WORLD);
+nk == current_rank && my_rank != 0 && i < TOTALITER-1){
+      MPI_Send(&my_counter, 1, MPI_INT, next_rank, 0, MPI_COMM_WORLD);
+    }
+    }
+
+
+  
 
   
 
