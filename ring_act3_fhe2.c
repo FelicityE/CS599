@@ -8,10 +8,10 @@
 
 
 //Example compilation
-//mpicc ring_act2_fhe2.c -lm -o ring_act2_fhe2
+//mpicc ring_act3_fhe2.c -lm -o ring_act3_fhe2
 
 //Example execution
-//mpirun -np 2 -hostfile myhostfile.txt ./ring_act2_fhe2
+//mpirun -np 2 -hostfile myhostfile.txt ./ring_act3_fhe2
 
 
 
@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
   }
 
   //Write code here
-  //buffer with my value
+    //buffer with my value
   int myValue;
 
   //buffer to receive data
@@ -44,21 +44,19 @@ int main(int argc, char **argv) {
   myValue = my_rank;
 
   MPI_Status status;
+  MPI_Request request;
+
   for(int i = 0; i <10; i++){
+    MPI_Isend(&myValue, 1, MPI_INT, (my_rank+1)%nprocs, 0, MPI_COMM_WORLD, &request);
     if(my_rank == 0){
-      MPI_Send(&myValue, 1, MPI_INT, 1, 0, MPI_COMM_WORLD);
       MPI_Recv(&myBuffer, 1, MPI_INT, nprocs-1, 0, MPI_COMM_WORLD, &status);
-    }else if(my_rank%2!=0){
-      MPI_Recv(&myBuffer, 1, MPI_INT, my_rank-1, 0, MPI_COMM_WORLD, &status);
-      MPI_Send(&myValue, 1, MPI_INT, (my_rank+1)%nprocs, 0, MPI_COMM_WORLD);
     }else{
-      MPI_Send(&myValue, 1, MPI_INT, (my_rank+1)%nprocs, 0, MPI_COMM_WORLD);
-      MPI_Recv(&myBuffer, 1, MPI_INT, my_rank-1, 0, MPI_COMM_WORLD, &status);
+      MPI_Recv(&myBuffer, 1, MPI_INT, (my_rank-1)%nprocs, 0, MPI_COMM_WORLD, &status);
     }
     mycounter += myBuffer;
   }
 
-  printf("\nRank: %d, my buffer: %d, my counter: %d\n\n", my_rank, myBuffer, mycounter); 
+  printf("\nRank: %d, my buffer: %d, my counter: %d\n\n", my_rank, myBuffer, mycounter);
 
   MPI_Finalize();
   return 0;

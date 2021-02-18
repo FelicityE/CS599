@@ -1,0 +1,11 @@
+Q1: What does process rank 5’s counter store at the end of the computation?
+A1: 20
+
+Q2: How many process ranks are used in the script above?
+A2: 10, as shown in --ntasks = 10
+
+Q3: What does process rank 5’s counter store at the end of the computation?
+A3: 40
+
+Q4: Comparing Programming Activities #2 and #3, which was easier to implement? Explain.
+A4: Act3 was easier than act 2 because I did not have to worry about deadlocking between the ranks when sending at the same time.
