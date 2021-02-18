@@ -8,7 +8,7 @@
 //mpicc random_act5_fhe2.c -lm -o random_act5_fhe2
 
 //Example execution
-//mpirun -np 1 -hostfile myhostfile.txt ./random_act5_fhe2
+//mpirun -np 50 -hostfile myhostfile.txt ./random_act5_fhe2
 
 //Do not change the seed, or your answer will not be correct
 #define SEED 72

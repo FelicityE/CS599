@@ -8,7 +8,7 @@
 //mpicc random_act4_fhe2.c -lm -o random_act4_fhe2
 
 //Example execution
-//mpirun -np 1 -hostfile myhostfile.txt ./random_act4_fhe2
+//mpirun -np 50 -hostfile myhostfile.txt ./random_act4_fhe2
 
 //Do not change the seed, or your answer will not be correct
 #define SEED 72
@@ -81,7 +81,7 @@ int main(int argc, char **argv) {
     }
     MPI_Bcast(&current_rank, 1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast(&next_rank, 1, MPI_INT, 0, MPI_COMM_WORLD);
-nk == current_rank && my_rank != 0 && i < TOTALITER-1){
+    if(my_rank == current_rank && my_rank != 0 && i < TOTALITER-1){
       MPI_Send(&my_counter, 1, MPI_INT, next_rank, 0, MPI_COMM_WORLD);
     }
     }
