@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
     if(my_rank == 0){
       MPI_Recv(&myBuffer, 1, MPI_INT, nprocs-1, 0, MPI_COMM_WORLD, &status);
     }else{
-      MPI_Recv(&myBuffer, 1, MPI_INT, (my_rank-1)%nprocs, 0, MPI_COMM_WORLD, &status);
+      MPI_Recv(&myBuffer, 1, MPI_INT, my_rank-1, 0, MPI_COMM_WORLD, &status);
     }
     mycounter += myBuffer;
   }
