@@ -52,7 +52,7 @@ int main(int argc, char **argv) {
   for(i = 0; i < TOTALITER; i++){
     if(my_rank == current_rank){
       next_rank = generateRandomRank(nprocs-1, my_rank);
-      printf("My rank: %d, next to recv: %d\n", my_rank, next_rank);
+      printf("My rank: %d, next rank to recv: %d\n", my_rank, next_rank);
       MPI_Send(&my_counter, 1, MPI_INT, next_rank, 0, MPI_COMM_WORLD);
     }
     MPI_Bcast(&next_rank, 1, MPI_INT, current_rank, MPI_COMM_WORLD);
