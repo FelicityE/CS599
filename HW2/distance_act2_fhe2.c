@@ -8,10 +8,10 @@
 
 
 //Example compilation
-//mpicc distance_matrix_starter.c -lm -o distance_matrix_starter
+//mpicc distance_matrix_fhe2.c -lm -o distance_matrix_fhe2
 
 //Example execution
-//mpirun -np 1 -hostfile myhostfile.txt ./distance_matrix_starter 100000 90 100 MSD_year_prediction_normalize_0_1_100k.txt
+//mpirun -np 1 -hostfile myhostfile.txt ./distance_matrix_fhe2 100000 90 100 MSD_year_prediction_normalize_0_1_100k.txt
 
 
 
