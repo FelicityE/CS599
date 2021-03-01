@@ -126,7 +126,6 @@ int main(int argc, char **argv) {
     printf("Sum: %f\n", globalSum);
   }
 
-
   //###########################################################################
   
   //free dataset
