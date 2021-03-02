@@ -14,7 +14,7 @@
 //mpirun -np 1 -hostfile myhostfile.txt ./distance_act1_fhe2 100000 90 100 MSD_year_prediction_normalize_0_1_100k.txt
 
 //Test run 
-// mpirun -np 4 -hostfile myhostfile.txt ./distance_act1_fhe2 10 2 1 MSD_year_prediction_normalize_0_1_100k.txt
+// mpirun -np 4 -hostfile myhostfile.txt ./distance_act1_fhe2 10 90 1 MSD_year_prediction_normalize_0_1_100k.txt
 
 
 //function prototypes
@@ -91,14 +91,14 @@ int main(int argc, char **argv) {
   int my_start = 0;
   double localsum = 0;
 
+
   // All ranks
   nrow = N/nprocs;
 
   // Per Rank 
   // Each rank gets it's respective col start point
   my_start = nrow*my_rank;
-  my_end = my_start+nrow;
-  // if my_rank is last rank: my_end += N mod nprocs
+  // if my_rank is last rank: nrow += N mod nprocs
   if(my_rank == nprocs-1){
     nrow += N%nprocs;
   }
@@ -110,7 +110,7 @@ int main(int argc, char **argv) {
     distmat[i]=(double*)malloc(sizeof(double)*N);
   }
 
-  printf("My rank: %d, My start: %d, My end: %d, My column size: %d\n", my_rank, my_start, my_end, nrow);
+  printf("My rank: %d, My start: %d, My row size: %d\n", my_rank, my_start, nrow);
   
   for(int i = 0; i < nrow; i++){
     for(int j = 0; j < N; j++){
