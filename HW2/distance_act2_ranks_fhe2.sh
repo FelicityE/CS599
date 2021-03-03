@@ -1,23 +1,23 @@
 #!/bin/bash
 
-#SBATCH --job-name=distance_act2_1rank
-##SBATCH --job-name=distance_act2_4rank  
-##SBATCH --job-name=distance_act2_8rank  
-##SBATCH --job-name=distance_act2_12rank  
-##SBATCH --job-name=distance_act2_16rank  
-##SBATCH --job-name=distance_act2_20rank           
+#SBATCH --job-name=distanceAct21rank
+##SBATCH --job-name=distanceAct24rank  
+##SBATCH --job-name=distanceAct28rank  
+##SBATCH --job-name=distanceAct212rank  
+##SBATCH --job-name=distanceAct216rank  
+##SBATCH --job-name=distanceAct220rank           
 
 
-#SBATCH --output=/home/fhe2/CS599/act2_1rank.out
-## SBATCH --output=/home/fhe2/CS599/act2_4rank.out
-## SBATCH --output=/home/fhe2/CS599/act2_8rank.out
-## SBATCH --output=/home/fhe2/CS599/act2_12rank.out
-## SBATCH --output=/home/fhe2/CS599/act2_16rank.out
-## SBATCH --output=/home/fhe2/CS599/act2_20rank.out	
+#SBATCH --output=/home/bwd29/Fel/CS599/HW2/act2_1rank.out
+## SBATCH --output=/home/bwd29/Fel/CS599/HW2/act2_4rank.out
+## SBATCH --output=/home/bwd29/Fel/CS599/HW2/act2_8rank.out
+## SBATCH --output=/home/bwd29/Fel/CS599/HW2/act2_12rank.out
+## SBATCH --output=/home/bwd29/Fel/CS599/HW2/act2_16rank.out
+## SBATCH --output=/home/bwd29/Fel/CS599/HW2/act2_20rank.out	
 
-#SBATCH --error=/home/fhe2/CS599/act2_ranks.err
-#SBATCH --time=01:00				
-#SBATCH --mem=2000 
+#SBATCH --error=/home/bwd29/Fel/CS599/HW2/act2_ranks.err
+#SBATCH --time=00:30				
+#SBATCH --mem=85000
 #SBATCH -C hw
 #SBATCH --nodes=1
 
@@ -34,6 +34,6 @@
 
 module load openmpi
 
-mpicc -03 ~/CS599/distance_act2_fhe2.c -lm -o ~/CS599/distance_act2_fhe2
+mpicc -O3 distance_act2_fhe2.c -lm -o distance_act2_fhe2
 
-srun ~/CS599/distance_act2_fhe2 100000 90 - ~/CS599/MSD_year_prediction_normalize_0_1_100k.txt
+srun distance_act2_fhe2 100000 90 !!!! MSD_year_prediction_normalize_0_1_100k.txt
