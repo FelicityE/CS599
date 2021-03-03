@@ -8,18 +8,19 @@
 ##SBATCH --job-name=distanceAct220rank           
 
 
-#SBATCH --output=/home/bwd29/Fel/CS599/HW2/act2_1rank.out
-## SBATCH --output=/home/bwd29/Fel/CS599/HW2/act2_4rank.out
-## SBATCH --output=/home/bwd29/Fel/CS599/HW2/act2_8rank.out
-## SBATCH --output=/home/bwd29/Fel/CS599/HW2/act2_12rank.out
-## SBATCH --output=/home/bwd29/Fel/CS599/HW2/act2_16rank.out
-## SBATCH --output=/home/bwd29/Fel/CS599/HW2/act2_20rank.out	
+#SBATCH --output=/home/fhe2/CS599/HW2/act2_1rank.out
+## SBATCH --output=/home/fhe2/CS599/HW2/act2_4rank.out
+## SBATCH --output=/home/fhe2/CS599/HW2/act2_8rank.out
+## SBATCH --output=/home/fhe2/CS599/HW2/act2_12rank.out
+## SBATCH --output=/home/fhe2/CS599/HW2/act2_16rank.out
+## SBATCH --output=/home/fhe2/CS599/HW2/act2_20rank.out	
 
-#SBATCH --error=/home/bwd29/Fel/CS599/HW2/act2_ranks.err
+#SBATCH --error=/home/fhe2/CS599/HW2/act2_ranks.err
 #SBATCH --time=00:30				
 #SBATCH --mem=85000
 #SBATCH -C hw
 #SBATCH --nodes=1
+#SBATCH --account=cs599-spr21
 
 #SBATCH --ntasks=1
 ##SBATCH --ntasks=4

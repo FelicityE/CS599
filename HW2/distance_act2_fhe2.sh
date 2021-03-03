@@ -3,13 +3,14 @@
 #SBATCH --job-name=distanceAct2B       
 
 
-#SBATCH --output=/home/bwd29/Fel/CS599/HW2/act2_b.out
+#SBATCH --output=/home/fhe2/CS599/HW2/act2_b.out
 
-#SBATCH --error=/home/bwd29/Fel/CS599/HW2/act2_b.err
+#SBATCH --error=/home/fhe2/CS599/HW2/act2_b.err
 #SBATCH --time=05:00				
 #SBATCH --mem=85000 #
 #SBATCH -C hw
 #SBATCH --nodes=1
+#SBATCH --account=cs599-spr21
 
 #SBATCH --ntasks=20
 
