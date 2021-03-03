@@ -8,7 +8,8 @@
 
 
 //Example compilation
-//mpicc distance_act1_fhe2.c -lm -o distance_act1_fhe2
+//mpicc -O3 distance_act1_fhe2.c -lm -o distance_act1_fhe2
+//use -- exclusive
 
 //Example execution
 //mpirun -np 1 -hostfile myhostfile.txt ./distance_act1_fhe2 100000 90 100 MSD_year_prediction_normalize_0_1_100k.txt
@@ -65,7 +66,7 @@ int main(int argc, char **argv) {
    
     if (my_rank==0)
     {
-    printf("\nNumber of lines (N): %d, Dimensionality: %d, Block size: %d, Filename: %s\n\n", N, DIM, blocksize, inputFname);
+    printf("\nNumber of lines (N): %d, Dimensionality: %d, Block size: %d, Filename: %s\n", N, DIM, blocksize, inputFname);
     }
 
     //allocate memory for dataset
@@ -110,8 +111,10 @@ int main(int argc, char **argv) {
     distmat[i]=(double*)malloc(sizeof(double)*N);
   }
 
-  printf("My rank: %d, My start: %d, My row size: %d\n", my_rank, my_start, nrow);
+  // printf("My rank: %d, My start: %d, My row size: %d\n", my_rank, my_start, nrow);
   
+  MPI_Barrier(MPI_COMM_WORLD);
+  double tstart=MPI_Wtime();
   for(int i = 0; i < nrow; i++){
     for(int j = 0; j < N; j++){
       // calc dist
@@ -119,11 +122,15 @@ int main(int argc, char **argv) {
       localsum += distmat[i][j];
     }
   }
+  double tend=MPI_Wtime();
+  if(my_rank == 0){
+    printf("Time (s): %f\n", tend - tstart);  
+  }
 
   double globalSum = 0;
   MPI_Reduce(&localsum, &globalSum, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
   if(my_rank == 0){
-    printf("Sum: %f\n", globalSum);
+    printf("Sum: %f\n\n", globalSum);
   }
 
   //###########################################################################

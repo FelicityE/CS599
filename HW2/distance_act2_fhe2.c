@@ -8,7 +8,7 @@
 
 
 //Example compilation
-//mpicc distance_act2_fhe2.c -lm -o distance_act2_fhe2
+//mpicc -O3 distance_act2_fhe2.c -lm -o distance_act2_fhe2
 
 //Example execution
 //mpirun -np 3 -hostfile myhostfile.txt ./distance_act2_fhe2 10 90 100 MSD_year_prediction_normalize_0_1_100k.txt
@@ -94,7 +94,6 @@ int main(int argc, char **argv) {
   
   int trow = 0;
   int tcol = 0;
-  int tstart = 0;
 
   // tiles per row
   int tpr = ceil(N*1.0/blocksize);
@@ -120,7 +119,8 @@ int main(int argc, char **argv) {
   }
 
 
-
+  MPI_Barrier(MPI_COMM_WORLD);
+  double tstart=MPI_Wtime();
   int count = 0;
   /*for each block*/
   for(int i = 0; i < ntiles; i++){
@@ -130,8 +130,6 @@ int main(int argc, char **argv) {
         trow = nrow%blocksize;
       }
     }
-
-
     tcol = blocksize;
     if(N%blocksize != 0){
       int check_last_col = 0;
@@ -140,7 +138,6 @@ int main(int argc, char **argv) {
         tcol = N%blocksize;
       }
     }
-    
     /*for each row*/
     for(int j=my_start+i/tpr*blocksize; j < my_start+i/tpr*blocksize+trow; j++){
       /*for each col*/
@@ -150,14 +147,15 @@ int main(int argc, char **argv) {
       }
     } 
   }
+  double tend=MPI_Wtime();
   if(my_rank == 0){
-    printf("\n");
+    printf("Time (s): %f\n", tend - tstart);  
   }
 
   double globalSum = 0;
   MPI_Reduce(&localsum, &globalSum, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
   if(my_rank == 0){
-    printf("Sum: %f\n", globalSum);
+    printf("Sum: %f\n\n", globalSum);
   }
 
   //###########################################################################
