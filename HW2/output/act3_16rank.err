@@ -1,0 +1,24 @@
+
+ Performance counter stats for 'srun distance_act1_fhe2 100000 90 1 MSD_year_prediction_normalize_0_1_100k.txt':
+
+           174,783      cache-references:u                                          
+            20,960      cache-misses:u            #   11.992 % of all cache refs    
+
+      81.855171220 seconds time elapsed
+
+       0.007703000 seconds user
+       0.005800000 seconds sys
+
+
+
+ Performance counter stats for 'srun distance_act2_fhe2 100000 90 100 MSD_year_prediction_normalize_0_1_100k.txt':
+
+           164,839      cache-references:u                                          
+            28,809      cache-misses:u            #   17.477 % of all cache refs    
+
+      56.156468067 seconds time elapsed
+
+       0.006880000 seconds user
+       0.005983000 seconds sys
+
+

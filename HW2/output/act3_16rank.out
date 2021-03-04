@@ -1,0 +1,10 @@
+
+Number of lines (N): 100000, Dimensionality: 90, Block size: 1, Filename: MSD_year_prediction_normalize_0_1_100k.txt
+Time (s): 76.073229
+Sum: 455386000.680024
+
+
+Number of lines (N): 100000, Dimensionality: 90, Block size: 100, Filename: MSD_year_prediction_normalize_0_1_100k.txt
+Time (s): 50.339188
+Sum: 455386000.680013
+

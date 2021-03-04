@@ -9,14 +9,21 @@
 
 
 #SBATCH --output=/home/fhe2/CS599/HW2/act2_1rank.out
-## SBATCH --output=/home/fhe2/CS599/HW2/act2_4rank.out
-## SBATCH --output=/home/fhe2/CS599/HW2/act2_8rank.out
-## SBATCH --output=/home/fhe2/CS599/HW2/act2_12rank.out
-## SBATCH --output=/home/fhe2/CS599/HW2/act2_16rank.out
-## SBATCH --output=/home/fhe2/CS599/HW2/act2_20rank.out	
+##SBATCH --output=/home/fhe2/CS599/HW2/act2_4rank.out
+##SBATCH --output=/home/fhe2/CS599/HW2/act2_8rank.out
+##SBATCH --output=/home/fhe2/CS599/HW2/act2_12rank.out
+##SBATCH --output=/home/fhe2/CS599/HW2/act2_16rank.out
+##SBATCH --output=/home/fhe2/CS599/HW2/act2_20rank.out	
 
 #SBATCH --error=/home/fhe2/CS599/HW2/act2_ranks.err
-#SBATCH --time=00:30				
+
+#SBATCH --time=01:30:00				# for 1 rank
+##SBATCH --time=16:30				# for 4 ranks
+##SBATCH --time=08:00				# for 8 ranks
+##SBATCH --time=06:00				# for 12 ranks
+##SBATCH --time=05:00				# for 16 ranks
+##SBATCH --time=04:30				# for 20 ranks
+
 #SBATCH --mem=85000
 #SBATCH -C hw
 #SBATCH --nodes=1
@@ -37,4 +44,6 @@ module load openmpi
 
 mpicc -O3 distance_act2_fhe2.c -lm -o distance_act2_fhe2
 
-srun distance_act2_fhe2 100000 90 !!!! MSD_year_prediction_normalize_0_1_100k.txt
+srun distance_act2_fhe2 100000 90 100 MSD_year_prediction_normalize_0_1_100k.txt
+srun distance_act2_fhe2 100000 90 100 MSD_year_prediction_normalize_0_1_100k.txt
+srun distance_act2_fhe2 100000 90 100 MSD_year_prediction_normalize_0_1_100k.txt
