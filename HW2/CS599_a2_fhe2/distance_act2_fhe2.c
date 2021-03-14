@@ -98,6 +98,13 @@ int main(int argc, char **argv) {
   // tiles per row
   int tpr = ceil(N*1.0/blocksize);
 
+  // Allocate memory for distance matrix
+  double ** distmat;
+  distmat=(double**)malloc(sizeof(double*)*nrow);
+  for (int i=0; i<nrow; i++){
+    distmat[i]=(double*)malloc(sizeof(double)*N);
+  }
+
   // Assign N into Ranks
   nrow = N/nprocs;
   my_start = my_rank*nrow;
@@ -106,18 +113,6 @@ int main(int argc, char **argv) {
   }
 
   ntiles = ceil(nrow*1.0/blocksize) * tpr;
-
-
-  for(int i = 0; i < ntiles; i++){
-  }
-  
-  // // Allocate memory for distance matrix
-  double ** distmat;
-  distmat=(double**)malloc(sizeof(double*)*nrow);
-  for (int i=0; i<nrow; i++){
-    distmat[i]=(double*)malloc(sizeof(double)*N);
-  }
-
 
   MPI_Barrier(MPI_COMM_WORLD);
   double tstart=MPI_Wtime();
