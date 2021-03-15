@@ -29,7 +29,7 @@ int compfn (const void * a, const void * b)
 
 //Total input size is N, divided by nprocs
 //Doesn't matter if N doesn't evenly divide nprocs
-#define N 20
+#define N 18
 
 int main(int argc, char **argv) {
 
@@ -61,6 +61,11 @@ int main(int argc, char **argv) {
   unsigned long int localsum = 0;
   for(int i = 0; i < localN; i++){
     localsum += data[i];
+  }
+  unsigned long int globalSum = 0;
+  MPI_Reduce(&localsum, &globalSum, 1, MPI_UNSIGNED_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
+  if(my_rank == 0){
+    printf("Sum: %ld\n\n", globalSum);
   }
   // //Testing ***************************
   // for(int i = 0; i < nprocs; i++){
@@ -209,6 +214,16 @@ int main(int argc, char **argv) {
     printf("\n");
   }
 
+  // Checking 
+  localsum = 0;
+  for(int i = 0; i < data_len; i++){
+    localsum += myDataSet[i];
+  }
+  globalSum = 0;
+  MPI_Reduce(&localsum, &globalSum, 1, MPI_UNSIGNED_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
+  if(my_rank == 0){
+    printf("Sum: %ld\n\n", globalSum);
+  }
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////
   //free
   free(data); 
