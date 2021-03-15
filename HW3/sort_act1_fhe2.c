@@ -14,7 +14,6 @@
 
 
 void generateData(int * data, int SIZE);
-int cmp(const void * a, const void * b);
 
 
 int compfn (const void * a, const void * b)
@@ -22,14 +21,17 @@ int compfn (const void * a, const void * b)
   return ( *(int*)a - *(int*)b );
 }
 
+#define VERBOSE 0
 
 //Do not change the seed
 #define SEED 72
+// #define MAXVAL 1000000
 #define MAXVAL 10
 
 //Total input size is N, divided by nprocs
 //Doesn't matter if N doesn't evenly divide nprocs
-#define N 18
+// #define N 1000000000
+#define N 100
 
 int main(int argc, char **argv) {
 
@@ -58,6 +60,7 @@ int main(int argc, char **argv) {
   
   //Write code here
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // Checking sum before
   unsigned long int localsum = 0;
   for(int i = 0; i < localN; i++){
     localsum += data[i];
@@ -67,17 +70,11 @@ int main(int argc, char **argv) {
   if(my_rank == 0){
     printf("Sum: %ld\n\n", globalSum);
   }
-  // //Testing ***************************
-  // for(int i = 0; i < nprocs; i++){
-  //   if(my_rank == i){
-  //     printf("My rank: %d, My data: ", my_rank);
-  //     for(int j = 0; j < localN; j++){
-  //       printf(" %d ", data[j]);
-  //     }
-  //     printf("\n");
-  //   }
-  // }
 
+
+  // Timing
+  MPI_Barrier(MPI_COMM_WORLD);
+  double tstart=MPI_Wtime();
 
   int inSize = 0; // incoming size/recv size buffer, assume 0 incase no data recieved from rank x; 
   int all_inSize[nprocs];
@@ -90,8 +87,12 @@ int main(int argc, char **argv) {
   if(my_rank == nprocs-1){
     myend += MAXVAL%nprocs;
   }
+  
   // mybucket = [mystart, myend)
-  printf("My rank: %d, My bucket: [%d, %d) \n", my_rank, mystart, myend);
+  if(VERBOSE){
+    printf("My rank: %d, My bucket: [%d, %d) \n", my_rank, mystart, myend);
+  }
+
   //allocate old_temp_data = size data (localN)
   int * oldData = (int*)malloc(sizeof(int)*localN);
   // add data to old_temp_data
@@ -101,18 +102,7 @@ int main(int argc, char **argv) {
   //allocate new_temp_data = size old_temp_data
   int * newData = (int*)malloc(sizeof(int)*localN);
 
-  int size_oldData = localN;
-  //Testing ***************************
-  // if(my_rank == 0){
-  //   printf("Local N: %d \n", localN);
-  //   //Testing ***************************
-  //   printf("My rank: %d, My data: ", my_rank);
-  //   for(int j = 0; j < localN; j++){
-  //     printf(" %d ", data[j]);
-  //   }
-  //   printf("\n");
-  // }
-
+  int oldData_len = localN;
 
   int newData_len;  
   MPI_Status status;
@@ -134,7 +124,7 @@ int main(int argc, char **argv) {
       newData_len = 0;
 
       // for all old_temp_data
-      for(int j = 0; j < size_oldData; j++){
+      for(int j = 0; j < oldData_len; j++){
         // if not mine and in i's bucket
         if((oldData[j] < mystart || oldData[j] >= myend) &&
             (oldData[j] >= istart && oldData[j] < iend)){
@@ -150,30 +140,23 @@ int main(int argc, char **argv) {
         }
       }
 
-      // free old_temp_data
-      // printf("My rank: %d going to free oldData for iteration: %d\n", my_rank,i);
-      // free(oldData);
-      // printf("My rank: %d freed oldData for iteration: %d\n", my_rank,i);
-      // alocate old temp_data = size of new_temp_data - number of moved data
-      size_oldData = newData_len;
-      // int * oldData = (int*)malloc(sizeof(int)*size_oldData);
+      oldData_len = newData_len;
+      
       // move new_temp_data to old_temp_data
-
       for(int j = 0; j < newData_len; j++){
         oldData[j] = newData[j];
       }
       
-      // // free new_temp_data
-      // printf("My rank: %d going to free newData for iteration: %d\n", my_rank,i);
-      // free(newData);
-      // printf("My rank: %d freed newData for iteration: %d\n", my_rank,i);
-      // int * newData = (int*)malloc(sizeof(int)*size_oldData);
-          // Isend size to i
+      
+      // Isend size to i
       MPI_Isend(&send_len, 1, MPI_INT, i, 0, MPI_COMM_WORLD, &request);
-      printf("My rank: %d, Sending to rank: %d, sent: %d\n", my_rank, i, send_len);
+      if(VERBOSE){
+        printf("My rank: %d, Sending to rank: %d, sent: %d\n", my_rank, i, send_len);
+      }
       MPI_Isend(sendDataSetBuffer, send_len, MPI_INT, i, 1, MPI_COMM_WORLD, &request);
     }
   }
+
   // add old_temp_data into myDataSet;
   int data_len = 0;
   for(int i = 0; i < newData_len; i++){
@@ -185,7 +168,9 @@ int main(int argc, char **argv) {
     if(i != my_rank){
       MPI_Recv(&inSize, 1, MPI_INT, i, 0, MPI_COMM_WORLD, &status);
       all_inSize[i] = inSize;
-      printf("My rank: %d, Receiving from rank: %d, recieved: %d \n", my_rank, i, inSize);
+      if(VERBOSE){
+        printf("My rank: %d, Receiving from rank: %d, recieved: %d \n", my_rank, i, inSize);
+      }
       MPI_Recv(recvDatasetBuffer, inSize, MPI_INT, i, 1, MPI_COMM_WORLD, &status);
       for(int j = 0; j < inSize; j++){
         myDataSet[data_len+j] = recvDatasetBuffer[j];
@@ -194,24 +179,44 @@ int main(int argc, char **argv) {
     }
   }
 
-  if(my_rank == 2){
-    printf("My rank: %d, My data: ", my_rank);
-    for(int i = 0; i < data_len; i++){
-      printf(" %d ", myDataSet[i]);
-    }
-    printf("\n");
+  // Timing end
+  double tend=MPI_Wtime();
+  if(my_rank == 0){
+    printf("Time to Distribute (s): %f\n", tend - tstart);  
   }
 
 
-  //sort
-  qsort(myDataSet, data_len, sizeof(int), cmp);
-
-  if(my_rank == 2){
-    printf("My rank: %d, My data: ", my_rank);
-    for(int i = 0; i < data_len; i++){
-      printf(" %d ", myDataSet[i]);
+  if(VERBOSE){
+    if(my_rank == 2){
+      printf("My rank: %d, My data: ", my_rank);
+      for(int i = 0; i < data_len; i++){
+        printf(" %d ", myDataSet[i]);
+      }
+      printf("\n");
     }
-    printf("\n");
+  }
+
+  // Timing Sort
+  MPI_Barrier(MPI_COMM_WORLD);
+  double tSort_start=MPI_Wtime();
+  //sort
+  qsort(myDataSet, data_len, sizeof(int), compfn);
+  double tSort_end=MPI_Wtime();
+  //total time
+  double totalTime = (tend-tstart) + (tSort_end - tSort_start);
+  if(my_rank == 0){
+    printf("Time to Sort (s): %f\n", tSort_end - tSort_start);  
+    printf("Total Time (s): %f\n\n", totalTime);
+  }
+
+  if(VERBOSE){
+    if(my_rank == 2){
+      printf("My rank: %d, My data: ", my_rank);
+      for(int i = 0; i < data_len; i++){
+        printf(" %d ", myDataSet[i]);
+      }
+      printf("\n");
+    }
   }
 
   // Checking 
@@ -247,10 +252,4 @@ void generateData(int * data, int SIZE)
   
   data[i]=rand()%MAXVAL;
   }
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
-//compare for qsort
-int cmp(const void * a, const void * b){
-  return ( *(int*)a - *(int*)b );
 }
