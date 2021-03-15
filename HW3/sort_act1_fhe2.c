@@ -10,7 +10,7 @@
 //mpicc -O3 sort_act1_fhe2.c -lm -o sort_act1_fhe2
 
 //Example execution
-//mpirun -np 2 -hostfile myhostfile.txt ./sort_act1_fhe2
+//mpirun -np 3 -hostfile myhostfile.txt ./sort_act1_fhe2
 
 
 void generateData(int * data, int SIZE);
@@ -224,8 +224,11 @@ int main(int argc, char **argv) {
   if(my_rank == 0){
     printf("Sum: %ld\n\n", globalSum);
   }
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
   //free
+  free(newData);
+  free(oldData);
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////
   free(data); 
   free(sendDataSetBuffer); 
   free(recvDatasetBuffer); 
