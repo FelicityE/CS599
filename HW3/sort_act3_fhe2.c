@@ -23,14 +23,14 @@ int compfn (const void * a, const void * b)
 
 //Do not change the seed
 #define SEED 72
-// #define MAXVAL 1000000
-#define MAXVAL 1000
-#define BINWIDTH 10
+#define MAXVAL 1000000-
+// #define MAXVAL 1000
+#define BINWIDTH 100
 
 //Total input size is N, divided by nprocs
 //Doesn't matter if N doesn't evenly divide nprocs
-// #define N 1000000000
-#define N 1000000
+#define N 1000000000
+// #define N 1000000
 
 int main(int argc, char **argv) {
 
