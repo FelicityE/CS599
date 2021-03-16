@@ -131,6 +131,7 @@ int main(int argc, char **argv) {
   }
 
   for(int i = 0; i < nprocs; i++){
+    send_lenPR[i] = 0;
     sendDataSetBuffer_PR[i] =(int*)malloc(sizeof(int)*localN);
   }
   
@@ -139,21 +140,6 @@ int main(int argc, char **argv) {
       printf("Allocating sendDataSetBuffer first for loop complete \n");
     }  
   }
-  
-  for(int i = 0; i < nprocs; i++){
-    send_lenPR[i] = 0;
-    for(int j = 0; j < localN; j++){
-      // sendDataSetBuffer_PR[i][j] = 0;
-    }
-  }
-  
-  if(VERBOSE){
-    if(my_rank == 0){
-      printf("Allocating sendDataSetBuffer complete\n");
-    }  
-  }
-  
-  // MPI_Barrier(MPI_COMM_WORLD);
   // ****************************************************************
 
 
