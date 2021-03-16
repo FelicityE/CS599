@@ -181,6 +181,27 @@ int main(int argc, char **argv) {
   MPI_Status status;
   MPI_Request request;
   
+  // Testing ****************************************************************
+  int total_sendLen = 0;
+  int * send_lenPR = (int*)malloc(sizeof(int)*nprocs);
+  int ** sendDataSetBuffer_PR=(int**)malloc(sizeof(int*)*nprocs); // perRank
+  if(VERBOSE){
+    if(my_rank == 0){
+      printf("Allocating sendDataSetBuffer before for loop\n");
+    }  
+  }
+
+  for(int i = 0; i < nprocs; i++){
+    sendDataSetBuffer_PR[i] =(int*)malloc(sizeof(int)*localN);
+    send_lenPR[i] = 0;
+  }
+  
+  if(VERBOSE){
+    if(my_rank == 0){
+      printf("Allocating sendDataSetBuffer first for loop complete \n");
+    }  
+  }
+  // ****************************************************************
 
   // for each rank expect my rank
   for(int i = 0; i < nprocs; i++){
@@ -216,14 +237,11 @@ int main(int argc, char **argv) {
       for(int j = 0; j < newData_len; j++){
         oldData[j] = newData[j];
       }
-      
-      
-      // Isend size to i
-      MPI_Isend(&send_len, 1, MPI_INT, i, 0, MPI_COMM_WORLD, &request);
-      if(VERBOSE){
-        printf("My rank: %d, Sending to rank: %d, sent: %d\n", my_rank, i, send_len);
+
+      send_lenPR[i] = send_len;
+      for(int j = 0; j < send_len; j++){
+        sendDataSetBuffer_PR[i][j] = sendDataSetBuffer[j];
       }
-      MPI_Isend(sendDataSetBuffer, send_len, MPI_INT, i, 1, MPI_COMM_WORLD, &request);
     }
   }
 
@@ -232,6 +250,16 @@ int main(int argc, char **argv) {
   for(int i = 0; i < newData_len; i++){
     myDataSet[i] = oldData[i];
     data_len++;
+  }
+
+  for (int i = 0; i < nprocs; i++){
+    if(i != my_rank){
+      MPI_Isend(&send_lenPR[i], 1, MPI_INT, i, 0, MPI_COMM_WORLD, &request);
+      if(VERBOSE){
+        printf("My rank: %d, Sending to rank: %d, sent: %d\n", my_rank, i, send_lenPR[i]);
+      }
+      MPI_Isend(sendDataSetBuffer_PR[i], send_lenPR[i], MPI_INT, i, 1, MPI_COMM_WORLD, &request);
+    }
   }
 
   for(int i = 0; i < nprocs; i++){
@@ -249,12 +277,18 @@ int main(int argc, char **argv) {
     }
   }
 
+  if(nprocs == 1){
+    data_len = localN;
+    for(int i = 0; i < data_len; i++){
+      myDataSet[i] = data[i];
+    }   
+  }
+
   // Timing end
   double tend=MPI_Wtime();
   if(my_rank == 0){
     printf("Time to Distribute (s): %f\n", tend - tstart);  
   }
-
 
   if(VERBOSE){
     if(my_rank == 2){
@@ -304,9 +338,6 @@ int main(int argc, char **argv) {
   free(newData);
   free(oldData);
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
   //free
   free(data); 
   free(sendDataSetBuffer); 

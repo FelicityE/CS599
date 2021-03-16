@@ -70,14 +70,19 @@ int main(int argc, char **argv) {
   if(my_rank == 0){
     printf("Sum: %ld\n\n", globalSum);
   }
+  
 
   unsigned long int localsum_cnt = 0;
-  localsum_cnt =localN;
+  
   unsigned long int globalSum_cnt = 0;
-  MPI_Reduce(&localsum_cnt, &globalSum_cnt, 1, MPI_UNSIGNED_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
-  if(my_rank == 0){
-    printf("N: %ld\n\n", globalSum_cnt);
+  if(VERBOSE){
+    localsum_cnt =localN;
+    MPI_Reduce(&localsum_cnt, &globalSum_cnt, 1, MPI_UNSIGNED_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
+    if(my_rank == 0){
+      printf("N: %ld\n\n", globalSum_cnt);
+    }
   }
+
 
   // Timing
   MPI_Barrier(MPI_COMM_WORLD);
@@ -115,7 +120,43 @@ int main(int argc, char **argv) {
   MPI_Status status;
   MPI_Request request;
   
+  // Testing ****************************************************************
   int total_sendLen = 0;
+  int * send_lenPR = (int*)malloc(sizeof(int)*nprocs);
+  int ** sendDataSetBuffer_PR=(int**)malloc(sizeof(int*)*nprocs); // perRank
+  if(VERBOSE){
+    if(my_rank == 0){
+      printf("Allocating sendDataSetBuffer before for loop\n");
+    }  
+  }
+
+  for(int i = 0; i < nprocs; i++){
+    sendDataSetBuffer_PR[i] =(int*)malloc(sizeof(int)*localN);
+  }
+  
+  if(VERBOSE){
+    if(my_rank == 0){
+      printf("Allocating sendDataSetBuffer first for loop complete \n");
+    }  
+  }
+  
+  for(int i = 0; i < nprocs; i++){
+    send_lenPR[i] = 0;
+    for(int j = 0; j < localN; j++){
+      // sendDataSetBuffer_PR[i][j] = 0;
+    }
+  }
+  
+  if(VERBOSE){
+    if(my_rank == 0){
+      printf("Allocating sendDataSetBuffer complete\n");
+    }  
+  }
+  
+  // MPI_Barrier(MPI_COMM_WORLD);
+  // ****************************************************************
+
+
   // for each rank expect my rank
   for(int i = 0; i < nprocs; i++){
     if(i != my_rank){
@@ -156,12 +197,20 @@ int main(int argc, char **argv) {
       }
       
       
-      // Isend size to i
-      MPI_Isend(&send_len, 1, MPI_INT, i, 0, MPI_COMM_WORLD, &request);
-      if(VERBOSE){
-        printf("My rank: %d, Sending to rank: %d, sent: %d\n", my_rank, i, send_len);
+      // Testing ****************************************************************
+      send_lenPR[i] = send_len;
+      for(int j = 0; j < send_len; j++){
+        sendDataSetBuffer_PR[i][j] = sendDataSetBuffer[j];
       }
-      MPI_Isend(sendDataSetBuffer, send_len, MPI_INT, i, 1, MPI_COMM_WORLD, &request);
+
+
+      // Isend size to i
+      // MPI_Isend(&send_len, 1, MPI_INT, i, 0, MPI_COMM_WORLD, &request);
+      // if(VERBOSE){
+      //   printf("My rank: %d, Sending to rank: %d, sent: %d\n", my_rank, i, send_len);
+      // }
+      // MPI_Isend(sendDataSetBuffer, send_len, MPI_INT, i, 1, MPI_COMM_WORLD, &request);
+      // ****************************************************************
     }
   }
 
@@ -171,6 +220,17 @@ int main(int argc, char **argv) {
     myDataSet[i] = oldData[i];
     data_len++;
   }
+
+  for (int i = 0; i < nprocs; i++){
+    if(i != my_rank){
+      MPI_Isend(&send_lenPR[i], 1, MPI_INT, i, 0, MPI_COMM_WORLD, &request);
+      if(VERBOSE){
+        printf("My rank: %d, Sending to rank: %d, sent: %d\n", my_rank, i, send_lenPR[i]);
+      }
+      MPI_Isend(sendDataSetBuffer_PR[i], send_lenPR[i], MPI_INT, i, 1, MPI_COMM_WORLD, &request);
+    }
+  }
+  
 
   for(int i = 0; i < nprocs; i++){
     if(i != my_rank){
@@ -194,13 +254,16 @@ int main(int argc, char **argv) {
     }   
   }
 
-  localsum_cnt = 0;
-  localsum_cnt =data_len;
-  globalSum_cnt = 0;
-  MPI_Reduce(&localsum_cnt, &globalSum_cnt, 1, MPI_UNSIGNED_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
-  if(my_rank == 0){
-    printf("N: %ld\n\n", globalSum_cnt);
+  if(VERBOSE){
+    localsum_cnt = 0;
+    localsum_cnt =data_len;
+    globalSum_cnt = 0;
+    MPI_Reduce(&localsum_cnt, &globalSum_cnt, 1, MPI_UNSIGNED_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
+    if(my_rank == 0){
+      printf("N: %ld\n\n", globalSum_cnt);
+    }
   }
+
 
   // Timing end
   double tend=MPI_Wtime();
@@ -243,13 +306,16 @@ int main(int argc, char **argv) {
     }
   }
 
-  localsum_cnt = 0;
-  localsum_cnt =data_len;
-  globalSum_cnt = 0;
-  MPI_Reduce(&localsum_cnt, &globalSum_cnt, 1, MPI_UNSIGNED_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
-  if(my_rank == 0){
-    printf("N: %ld\n\n", globalSum_cnt);
+  if(VERBOSE){
+    localsum_cnt = 0;
+    localsum_cnt =data_len;
+    globalSum_cnt = 0;
+    MPI_Reduce(&localsum_cnt, &globalSum_cnt, 1, MPI_UNSIGNED_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
+    if(my_rank == 0){
+      printf("N: %ld\n\n", globalSum_cnt);
+    }
   }
+  
 
   // Checking 
   localsum = 0;
