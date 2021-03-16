@@ -24,12 +24,13 @@ int compfn (const void * a, const void * b)
 //Do not change the seed
 #define SEED 72
 // #define MAXVAL 1000000
-#define MAXVAL 18
+#define MAXVAL 1000
+#define BINWIDTH 10
 
 //Total input size is N, divided by nprocs
 //Doesn't matter if N doesn't evenly divide nprocs
 // #define N 1000000000
-#define N 100
+#define N 1000000
 
 int main(int argc, char **argv) {
 
@@ -76,8 +77,12 @@ int main(int argc, char **argv) {
   
 
   // Changing buckets
-  // sort rank 0
-
+  // bb = bucket bounds array
+  int bbLen = nprocs+1; 
+  int * bb = (int*)malloc(sizeof(int)*bbLen);
+  for(int i = 0; i < bbLen; i++){
+    bb[i] = 0;
+  }
   if(my_rank == 0){
     if(VERBOSE){
       printf("My rank: %d, My data: ", my_rank);
@@ -88,7 +93,7 @@ int main(int argc, char **argv) {
     }
 
     //Histogram for rank 0 / small bins
-    int binWidth = 2; // some reasonable number CHANGE THIS FOR LARGER MAXVAL!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    int binWidth = BINWIDTH; // some reasonable number CHANGE THIS FOR LARGER MAXVAL!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     int nbins = MAXVAL/binWidth;
     int * bincnts = (int*)malloc(sizeof(int)*nbins);
     for(int i = 0; i < nbins; i++){
@@ -107,13 +112,6 @@ int main(int argc, char **argv) {
     }
 
     //Buckets
-    // bb = bucket bounds array
-    int bbLen = nprocs+1; 
-    int * bb = (int*)malloc(sizeof(int)*bbLen);
-    for(int i = 0; i < bbLen; i++){
-      bb[i] = 0;
-    }
-    
     int bbpos = 1;
     int counts = 0;
     for(int i = 0; i < nbins; i){
@@ -132,29 +130,36 @@ int main(int argc, char **argv) {
         bb[bbpos] = i*binWidth;
       }
     }
+    
     if(VERBOSE){
-    printf("My Rank: %d, bucket array: ", my_rank);
-    for(int i = 0; i < bbLen; i++){
-      printf("%d ",bb[i]);
+      printf("My Rank: %d, bucket array: ", my_rank);
+      for(int i = 0; i < bbLen; i++){
+        printf("%d ",bb[i]);
+      }
+      printf("\n");
     }
-    printf("\n");
+    free(bincnts);
+  }
+  // tell everyone else everyone's bucket size
+  MPI_Bcast(bb, bbLen, MPI_INT, 0, MPI_COMM_WORLD);
+
+  if(VERBOSE){
+    if(my_rank == 1){
+      printf("My Rank: %d, My bb: ", my_rank);
+      for(int i = 0; i < bbLen; i++){
+        printf("%d ",bb[i]);
+      }
+      printf("\n");
     }
   }
 
-
-  // tell everyone else everyone's bucket size
-  
   int inSize = 0; // incoming size/recv size buffer, assume 0 incase no data recieved from rank x; 
   int all_inSize[nprocs];
   
   int ror = MAXVAL/nprocs; //range over ranks
   //everyone
-  int mystart = my_rank*ror;
-  int myend = mystart + ror;
-  // unless my rank is last rank
-  if(my_rank == nprocs-1){
-    myend += MAXVAL%nprocs;
-  }
+  int mystart = bb[my_rank];
+  int myend = bb[my_rank+1];
   
   // mybucket = [mystart, myend)
   if(VERBOSE){
@@ -181,11 +186,8 @@ int main(int argc, char **argv) {
   for(int i = 0; i < nprocs; i++){
     if(i != my_rank){
       // i bucket
-      int istart = i*ror;
-      int iend = istart + ror;
-      if(i == nprocs-1){
-        iend += MAXVAL%nprocs;
-      }
+      int istart = bb[i];
+      int iend = bb[i+1];
       // Number of data moved counter
       int send_len = 0;
       // postion in new data counter

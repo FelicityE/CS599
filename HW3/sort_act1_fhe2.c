@@ -25,13 +25,13 @@ int compfn (const void * a, const void * b)
 
 //Do not change the seed
 #define SEED 72
-#define MAXVAL 1000000
-// #define MAXVAL 10
+// #define MAXVAL 1000000
+#define MAXVAL 1000
 
 //Total input size is N, divided by nprocs
 //Doesn't matter if N doesn't evenly divide nprocs
-#define N 1000000000
-// #define N 100
+// #define N 1000000000
+#define N 1000000
 
 int main(int argc, char **argv) {
 
@@ -71,6 +71,13 @@ int main(int argc, char **argv) {
     printf("Sum: %ld\n\n", globalSum);
   }
 
+  unsigned long int localsum_cnt = 0;
+  localsum_cnt =localN;
+  unsigned long int globalSum_cnt = 0;
+  MPI_Reduce(&localsum_cnt, &globalSum_cnt, 1, MPI_UNSIGNED_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
+  if(my_rank == 0){
+    printf("N: %ld\n\n", globalSum_cnt);
+  }
 
   // Timing
   MPI_Barrier(MPI_COMM_WORLD);
@@ -108,7 +115,7 @@ int main(int argc, char **argv) {
   MPI_Status status;
   MPI_Request request;
   
-
+  int total_sendLen = 0;
   // for each rank expect my rank
   for(int i = 0; i < nprocs; i++){
     if(i != my_rank){
@@ -132,6 +139,7 @@ int main(int argc, char **argv) {
           sendDataSetBuffer[send_len] = oldData[j];
           //update send position/number of data being moved
           send_len++;
+          total_sendLen += send_len;
         }else{
           //new_temp_data adds data not sent
           newData[newData_len] = oldData[j];
@@ -143,7 +151,7 @@ int main(int argc, char **argv) {
       oldData_len = newData_len;
       
       // move new_temp_data to old_temp_data
-      for(int j = 0; j < newData_len; j++){
+      for(int j = 0; j < oldData_len; j++){
         oldData[j] = newData[j];
       }
       
@@ -178,6 +186,21 @@ int main(int argc, char **argv) {
       data_len += inSize;
     }
   }
+  
+  if(nprocs == 1){
+    data_len = localN;
+    for(int i = 0; i < data_len; i++){
+      myDataSet[i] = data[i];
+    }   
+  }
+
+  localsum_cnt = 0;
+  localsum_cnt =data_len;
+  globalSum_cnt = 0;
+  MPI_Reduce(&localsum_cnt, &globalSum_cnt, 1, MPI_UNSIGNED_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
+  if(my_rank == 0){
+    printf("N: %ld\n\n", globalSum_cnt);
+  }
 
   // Timing end
   double tend=MPI_Wtime();
@@ -195,6 +218,7 @@ int main(int argc, char **argv) {
       printf("\n");
     }
   }
+
 
   // Timing Sort
   MPI_Barrier(MPI_COMM_WORLD);
@@ -217,6 +241,14 @@ int main(int argc, char **argv) {
       }
       printf("\n");
     }
+  }
+
+  localsum_cnt = 0;
+  localsum_cnt =data_len;
+  globalSum_cnt = 0;
+  MPI_Reduce(&localsum_cnt, &globalSum_cnt, 1, MPI_UNSIGNED_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
+  if(my_rank == 0){
+    printf("N: %ld\n\n", globalSum_cnt);
   }
 
   // Checking 
