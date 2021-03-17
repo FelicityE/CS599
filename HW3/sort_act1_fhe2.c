@@ -5,13 +5,11 @@
 #include <math.h>
 #include <string.h>
 
-
 //Example compilation
 //mpicc -O3 sort_act1_fhe2.c -lm -o sort_act1_fhe2
 
 //Example execution
 //mpirun -np 3 -hostfile myhostfile.txt ./sort_act1_fhe2
-
 
 void generateData(int * data, int SIZE);
 
@@ -60,6 +58,9 @@ int main(int argc, char **argv) {
   
   //Write code here
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+  if(my_rank == 0){
+    printf("Act 1: Uniform, Number of Ranks: %d\n\n",nprocs);
+  }
   // Checking sum before
   unsigned long int localsum = 0;
   for(int i = 0; i < localN; i++){
@@ -68,12 +69,10 @@ int main(int argc, char **argv) {
   unsigned long int globalSum = 0;
   MPI_Reduce(&localsum, &globalSum, 1, MPI_UNSIGNED_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
   if(my_rank == 0){
-    printf("Sum: %ld\n\n", globalSum);
+    printf("Sum Before: %ld\n\n", globalSum);
   }
   
-
   unsigned long int localsum_cnt = 0;
-  
   unsigned long int globalSum_cnt = 0;
   if(VERBOSE){
     localsum_cnt =localN;
@@ -83,9 +82,7 @@ int main(int argc, char **argv) {
     }
   }
 
-
   // Timing
-  MPI_Barrier(MPI_COMM_WORLD);
   double tstart=MPI_Wtime();
 
   int inSize = 0; // incoming size/recv size buffer, assume 0 incase no data recieved from rank x; 
@@ -181,22 +178,11 @@ int main(int argc, char **argv) {
       for(int j = 0; j < oldData_len; j++){
         oldData[j] = newData[j];
       }
-      
-      
-      // Testing ****************************************************************
+
       send_lenPR[i] = send_len;
       for(int j = 0; j < send_len; j++){
         sendDataSetBuffer_PR[i][j] = sendDataSetBuffer[j];
       }
-
-
-      // Isend size to i
-      // MPI_Isend(&send_len, 1, MPI_INT, i, 0, MPI_COMM_WORLD, &request);
-      // if(VERBOSE){
-      //   printf("My rank: %d, Sending to rank: %d, sent: %d\n", my_rank, i, send_len);
-      // }
-      // MPI_Isend(sendDataSetBuffer, send_len, MPI_INT, i, 1, MPI_COMM_WORLD, &request);
-      // ****************************************************************
     }
   }
 
@@ -217,7 +203,6 @@ int main(int argc, char **argv) {
     }
   }
   
-
   for(int i = 0; i < nprocs; i++){
     if(i != my_rank){
       MPI_Recv(&inSize, 1, MPI_INT, i, 0, MPI_COMM_WORLD, &status);
@@ -250,11 +235,13 @@ int main(int argc, char **argv) {
     }
   }
 
-
-  // Timing end
+  // Timing reduction
   double tend=MPI_Wtime();
+  double globalMax_distTime;
+  double dist_time = tend - tstart;
+  MPI_Reduce(&dist_time, &globalMax_distTime, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
   if(my_rank == 0){
-    printf("Time to Distribute (s): %f\n", tend - tstart);  
+    printf("Time to Distribute (s): %f\n", globalMax_distTime);  
   }
 
 
@@ -270,16 +257,21 @@ int main(int argc, char **argv) {
 
 
   // Timing Sort
-  MPI_Barrier(MPI_COMM_WORLD);
   double tSort_start=MPI_Wtime();
   //sort
   qsort(myDataSet, data_len, sizeof(int), compfn);
   double tSort_end=MPI_Wtime();
+  
+  double globalMax_sortTime;
+  double sort_time = tSort_end - tSort_start;
+  MPI_Reduce(&sort_time, &globalMax_sortTime, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
   //total time
-  double totalTime = (tend-tstart) + (tSort_end - tSort_start);
+  double globalMax_totalTime;
+  double totalTime = dist_time+sort_time;
+  MPI_Reduce(&totalTime, &globalMax_totalTime, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
   if(my_rank == 0){
-    printf("Time to Sort (s): %f\n", tSort_end - tSort_start);  
-    printf("Total Time (s): %f\n\n", totalTime);
+    printf("Time to Sort (s): %f\n", globalMax_sortTime);  
+    printf("Total Time (s): %f\n\n", globalMax_totalTime);
   }
 
   if(VERBOSE){
@@ -293,7 +285,6 @@ int main(int argc, char **argv) {
   }
 
   if(VERBOSE){
-    localsum_cnt = 0;
     localsum_cnt =data_len;
     globalSum_cnt = 0;
     MPI_Reduce(&localsum_cnt, &globalSum_cnt, 1, MPI_UNSIGNED_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
@@ -311,7 +302,7 @@ int main(int argc, char **argv) {
   globalSum = 0;
   MPI_Reduce(&localsum, &globalSum, 1, MPI_UNSIGNED_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
   if(my_rank == 0){
-    printf("Sum: %ld\n\n", globalSum);
+    printf("Sum After: %ld\n\n", globalSum);
   }
   
   //free
