@@ -4,12 +4,16 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include "RTree.h"
+
 
 //Example compilation
-//mpicc -O3 range_act1_fhe2.c -lm -o range_act1_fhe2
+//mpic++ -O3 range_act2_fhe2.cpp -lm -o range_act2_fhe2
 
 //Example execution
-//mpirun -np 1 -hostfile myhostfile.txt ./range_act1_fhe2 100 100
+//mpirun -np 1 -hostfile myhostfile.txt ./range_act2_fhe2 1000000 1000
+
+
 
 struct dataStruct
 {
@@ -24,6 +28,35 @@ struct queryStruct
   double x_max;
   double y_max;
 };
+
+///////////////////////
+//For R-tree
+
+bool MySearchCallback(int id, void* arg) 
+{
+  // printf("Hit data rect %d\n", id);
+  return true; // keep going
+}
+
+struct Rect
+{
+  Rect()  {}
+
+  Rect(double a_minX, double a_minY, double a_maxX, double a_maxY)
+  {
+    min[0] = a_minX;
+    min[1] = a_minY;
+
+    max[0] = a_maxX;
+    max[1] = a_maxY;
+  }
+
+
+  double min[2];
+  double max[2];
+};
+
+///////////////////////
 
 void generateData(struct dataStruct * data, unsigned int localN);
 void generateQueries(struct queryStruct * data, unsigned int localQ, int my_rank);
@@ -50,7 +83,7 @@ int main(int argc, char **argv) {
   
 
   if (argc != 3) {
-    fprintf(stderr,"Please provide the following on the command line: <Num data points> <Num query points> \n");
+    fprintf(stderr,"Please provide the following on the command line: <Num data points> <Num query points>\n");
     MPI_Finalize();
     exit(0);
   }
@@ -76,40 +109,50 @@ int main(int argc, char **argv) {
   struct queryStruct * queries=(struct queryStruct *)malloc(sizeof(struct queryStruct)*localQ);
   generateQueries(queries, localQ, my_rank);
 
-  MPI_Barrier(MPI_COMM_WORLD);  
+  MPI_Barrier(MPI_COMM_WORLD);   
 
 
   //Write code here
-  // Timing
-  double tstart=MPI_Wtime();
+  // Construction:
+  double timeC_start=MPI_Wtime();
+  RTree<int, double, 2, double> tree;
+  for (int i=0; i<localN; i++)
+  {
+    Rect tmp=Rect(data[i].x,data[i].y,data[i].x,data[i].y);
+    tree.Insert(tmp.min, tmp.max,i);
+  }
+  double timeC_end=MPI_Wtime();
 
-  // // allocate memory for each queries hit count
-  // unsigned int * querie_cnt = (unsigned int*)malloc(sizeof(unsigned int)*localQ);
-  // // set querie counts to zero to avoid bad stuff
-  // for(int i = 0; i < localQ; i++){
-  //   querie_cnt[i] = 0;
-  // }
-  // for all queries get all data in range
+  //Search:
+  double timeS_start=MPI_Wtime();
   for(int i = 0; i < localQ; i++){
-    for(int j = 0; j < localN; j++){
-      if((data[j].x >= queries[i].x_min)
-        &&(data[j].x <= queries[i].x_max)
-        &&(data[j].y >= queries[i].y_min)
-        &&(data[j].y <= queries[i].y_max)){
-          numResults[i]++;
-        }
-    }
+    Rect searchR=Rect(queries[i].x_min, queries[i].y_min, queries[i].x_max, queries[i].y_max);
+    numResults[i] = tree.Search(searchR.min, searchR.max, MySearchCallback, NULL);
   }
+  double timeS_end=MPI_Wtime();
 
-  // Timing reduction
-  double tend=MPI_Wtime();
-  double globalMaxTime;
-  double tTime = tend - tstart;
-  MPI_Reduce(&tTime, &globalMaxTime, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+  // Timing max reductions
+  double timeC = timeC_end - timeC_start;
+  double timeS = timeS_end - timeS_start;
+  double timeT = timeC + timeS;
+
+  double globalMaxTimeC;
+  MPI_Reduce(&timeC, &globalMaxTimeC, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
   if(my_rank == 0){
-    printf("Time: %f\n", globalMaxTime);  
+    printf("Time to Construct: %f\n", globalMaxTimeC);  
+  }
+  double globalMaxTimeS;
+  MPI_Reduce(&timeS, &globalMaxTimeS, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+  if(my_rank == 0){
+    printf("Time to Search: %f\n", globalMaxTimeS);  
+  }
+  double globalMaxTimeT;
+  MPI_Reduce(&timeT, &globalMaxTimeT, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+  if(my_rank == 0){
+    printf("Total Time: %f\n", globalMaxTimeT);  
   }
 
+  // Sum Reductions
   unsigned int localsum = 0;
   for(int i = 0; i < localQ; i++){
     localsum += numResults[i];
@@ -119,7 +162,6 @@ int main(int argc, char **argv) {
   if(my_rank == 0){
     printf("Sum: %d\n\n", globalSum);
   }
-
 
   MPI_Finalize();
   return 0;
