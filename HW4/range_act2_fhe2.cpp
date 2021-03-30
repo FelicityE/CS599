@@ -11,7 +11,7 @@
 //mpic++ -O3 range_act2_fhe2.cpp -lm -o range_act2_fhe2
 
 //Example execution
-//mpirun -np 1 -hostfile myhostfile.txt ./range_act2_fhe2 1000000 1000
+//mpirun -np 1 -hostfile myhostfile.txt ./range_act2_fhe2 2000000 100000
 
 
 
@@ -113,6 +113,9 @@ int main(int argc, char **argv) {
 
 
   //Write code here
+  if(my_rank == 0){
+    printf("Number of Ranks: %d\n", nprocs);
+  }
   // Construction:
   double timeC_start=MPI_Wtime();
   RTree<int, double, 2, double> tree;

@@ -9,7 +9,7 @@
 //mpicc -O3 range_act1_fhe2.c -lm -o range_act1_fhe2
 
 //Example execution
-//mpirun -np 1 -hostfile myhostfile.txt ./range_act1_fhe2 100 100
+//mpirun -np 1 -hostfile myhostfile.txt ./range_act1_fhe2 2000000 100000
 
 struct dataStruct
 {

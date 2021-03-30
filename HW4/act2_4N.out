@@ -1,0 +1,36 @@
+Number of Ranks: 1
+Time to Construct: 2.425071
+Time to Search: 15.139629
+Total Time: 17.564701
+Sum: 466380694
+
+Number of Ranks: 4
+Time to Construct: 2.467728
+Time to Search: 3.879589
+Total Time: 6.347317
+Sum: 469453172
+
+Number of Ranks: 8
+Time to Construct: 2.430354
+Time to Search: 1.922181
+Total Time: 4.351275
+Sum: 468426414
+
+Number of Ranks: 12
+Time to Construct: 2.438134
+Time to Search: 1.536202
+Total Time: 3.954402
+Sum: 469588802
+
+Number of Ranks: 16
+Time to Construct: 2.470568
+Time to Search: 0.991192
+Total Time: 3.457586
+Sum: 467780256
+
+Number of Ranks: 20
+Time to Construct: 2.516376
+Time to Search: 0.938483
+Total Time: 3.439265
+Sum: 467634204
+

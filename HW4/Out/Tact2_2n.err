@@ -1,0 +1,7 @@
+--------------------------------------------------------------------------
+The Open MPI wrapper compiler was unable to find the specified compiler
+g++ in your PATH.
+
+Note that this compiler was either specified at configure time or in
+one of several possible environment variables.
+--------------------------------------------------------------------------
