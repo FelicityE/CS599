@@ -94,6 +94,10 @@ int main(int argc, char **argv) {
 //###########################################################################
   //Write code here
   // Initialize variables used
+    // Timing total time
+  double tStart = MPI_Wtime();
+  double tDist = 0;
+  double tCent = 0;
   int localN = N/nprocs;
   int myStart = my_rank * localN;
   if(my_rank == nprocs-1){
@@ -101,11 +105,13 @@ int main(int argc, char **argv) {
   }
   int ksN = KMEANS*DIM;
   double * ks;
+  double * secondToLastKS;
   int * clusterID;
   int * clusterSize;
 
   //allocate memory for arrays used
   ks = (double*)malloc(sizeof(double)*ksN);
+  secondToLastKS = (double*)malloc(sizeof(double)*ksN);
   clusterID = (int*)calloc(sizeof(int),localN);
   clusterSize = (int*)malloc(sizeof(int)*KMEANS);
 
@@ -140,11 +146,18 @@ int main(int argc, char **argv) {
   
   //big loop
   for(int i = 0; i < KMEANSITERS; i++){
+    //Timing updating Centriod
+    double tCentStart = MPI_Wtime();
     // setting up clusterSize to be reused;
     for(int j = 0; j < KMEANS; j++){
       clusterSize[j] = 0;
     }
+    //Timing updating Centriod
+    double tCentEnd = MPI_Wtime();
+    tCent += tCentEnd-tCentStart;
 
+    // Timing Dist calc
+    double tDistStart=MPI_Wtime();
     //finding closest k
     for(int j = 0; j < localN; j++){
       double dist = 0;
@@ -162,6 +175,9 @@ int main(int argc, char **argv) {
       }
       clusterID[j] = closeK;
     }
+    //Timing Dist calc
+    double tDistEnd=MPI_Wtime();
+    tDist += tDistEnd-tDistStart;
     if(VERBOSE){
       if(my_rank == 0){
         printf("\n");
@@ -173,13 +189,16 @@ int main(int argc, char **argv) {
       }
     }
 
+
+    //Timing updating Centriod
+    tCentStart = MPI_Wtime();
     //getting sizes of clusters
     for(int j = 0; j<localN; j++){
       clusterSize[clusterID[j]]++;
     }
     int * globalClusterSize;
     globalClusterSize = (int*)malloc(sizeof(int)*KMEANS);
-    MPI_Barrier(MPI_COMM_WORLD);
+    // MPI_Barrier(MPI_COMM_WORLD);
     MPI_Allreduce(clusterSize, globalClusterSize, KMEANS, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
     if(VERBOSE){
       if(my_rank == 0){
@@ -192,6 +211,11 @@ int main(int argc, char **argv) {
       }
     }
 
+    if(i == KMEANSITERS-1){
+      for(int j =0; j < ksN; j++){
+        secondToLastKS[j] = ks[j];
+      }
+    }
 
     // updating clusterSize; setting up ks to be reused
     for(int j = 0; j < KMEANS; j++){
@@ -262,7 +286,7 @@ int main(int argc, char **argv) {
     //getting total mean
     double * globalKS;
     globalKS = (double*)malloc(sizeof(double)*ksN);
-    MPI_Barrier(MPI_COMM_WORLD);
+    // MPI_Barrier(MPI_COMM_WORLD);
     MPI_Allreduce(ks, globalKS, ksN, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
     if(VERBOSE){
       if(my_rank == 0){
@@ -277,7 +301,7 @@ int main(int argc, char **argv) {
 
 
     // updating ks
-    MPI_Barrier(MPI_COMM_WORLD);
+    // MPI_Barrier(MPI_COMM_WORLD);
     for(int j = 0; j < ksN; j++){
       ks[j] = globalKS[j];
     }
@@ -291,10 +315,22 @@ int main(int argc, char **argv) {
         printf("\n");
       }
     }
+    free(globalClusterSize);
+    free(globalKS);
+
+    //Timing updating Centriod
+    tCentEnd = MPI_Wtime();
+    tCent += tCentEnd-tCentStart;
   }
+  // Timing total time
+  double tEnd = MPI_Wtime();
+  double tTime = tEnd-tStart;
+
+
+
 
   // printing final results
-  // if(VERBOSE){
+  if(VERBOSE){
     if(my_rank == 0){
       printf("\n");
       printf("Final Global Cluster Size: ");
@@ -303,18 +339,42 @@ int main(int argc, char **argv) {
       }
       printf("\n");
     }
-  // }
+  }
 
   // if(VERBOSE){
     if(my_rank == 0){
       printf("\n");
-      printf("Final Global k Means : ");
-      for(int i = 0; i < ksN; i++){
-        printf("%f, ", ks[i]);
+      printf("Final (Second to Last) Global k Means : \n");
+      for(int i = 0; i < KMEANS; i++){
+        for(int j = 0; j < DIM; j++){
+          if(j%2 == 0){
+            printf("%f ", secondToLastKS[i*DIM+j]);
+          }else{
+            printf("%f \n", secondToLastKS[i*DIM+j]);
+          }
+        }
+
       }
       printf("\n");
     }
   // }
+
+  // Getting global max times
+  double maxTotalTime;
+  double maxDistTime;
+  double maxCentTime;
+  MPI_Reduce(&tTime, &maxTotalTime, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+  MPI_Reduce(&tDist, &maxDistTime, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+  MPI_Reduce(&tCent, &maxCentTime, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+  if(my_rank == 0){
+    printf("Max Total Time: %f \nMax Dist Calc Time: %f \nMax Update Centriod Time: %f \n\n", maxTotalTime,maxDistTime,maxCentTime);  
+  }
+
+
+  free(ks);
+  free(secondToLastKS);
+  free(clusterID);
+  free(clusterSize);
 
 
 //###########################################################################
