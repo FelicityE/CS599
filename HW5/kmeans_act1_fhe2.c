@@ -112,7 +112,7 @@ int main(int argc, char **argv) {
   //allocate memory for arrays used
   ks = (double*)malloc(sizeof(double)*ksN);
   secondToLastKS = (double*)malloc(sizeof(double)*ksN);
-  clusterID = (int*)calloc(sizeof(int),localN);
+  clusterID = (int*)calloc(localN,sizeof(int));
   clusterSize = (int*)malloc(sizeof(int)*KMEANS);
 
   

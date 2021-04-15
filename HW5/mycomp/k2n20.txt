@@ -1,0 +1,11 @@
+
+Number of lines (N): 5159737, Dimensionality: 2, KMEANS: 2, Filename: iono_57min_5.16Mpts_2D.txt
+
+Final (Second to Last) Global k Means : 
+55.022087 31.677952 
+256.707236 30.152785 
+
+Max Total Time: 2.324003 
+Max Dist Calc Time: 0.892537 
+Max Update Centriod Time: 1.589079 
+

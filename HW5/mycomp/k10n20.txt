@@ -13,7 +13,7 @@ Final (Second to Last) Global k Means :
 42.709692 -32.863394 
 285.450247 29.444056 
 
-Max Total Time: 6.792239 
-Max Dist Calc Time: 5.136869 
-Max Update Centriod Time: 3.030509 
+Max Total Time: 6.161563 
+Max Dist Calc Time: 4.594603 
+Max Update Centriod Time: 2.189306 
 
